@@ -58,6 +58,30 @@ public:
 		if (count < 0) count = 0;
 		return *this;
 	}
+	bool operator<(const Product& p) const{
+		return getPrice() < p.getPrice();
+	}
+	bool operator>(const Product& p) const {
+		return getPrice() > p.getPrice();
+	}
+	bool operator==(const Product& p) const {
+		return getPrice() == p.getPrice() && getName() == p.getName() && getCount() == p.getCount() && getAvailable() == p.getAvailable();
+	}
+	bool NametoName(const Product& p) const {
+		return getName() == p.getName();
+	}
+	bool PricetoPrice(const Product& p) const {
+		return getPrice() == p.getPrice();
+	}
+	bool CounttoCountless(const Product& p) const {
+		return getCount() < p.getCount();
+	}
+	bool CounttoCountmore(const Product& p) const {
+		return getCount() > p.getCount();
+	}
+	bool CounttoCountequal(const Product& p) const {
+		return getCount() == p.getCount();
+	}
 };
 int main()
 {
