@@ -42,15 +42,27 @@ public:
 	bool getAvailable() const {
 		return available;
 	}
-	void getInfo() {
+	void getInfo() const {
 		cout << "Name: " << name << endl;
 		cout << "Count: " << count << endl;
 		cout << "Price: " << price << endl;
 		cout << boolalpha << "Available: " << available << endl;
+	}
+	Product& operator+=(int c) {
+		count += c;
+		return *this;
+	}
+
+	Product& operator-=(int c) {
+		count -= c;
+		if (count < 0) count = 0;
+		return *this;
 	}
 };
 int main()
 {
 	Product p("Apple", 10, 15, true);
 	p.getInfo();
+	p += 10;
+	cout << p.getCount();
 }
