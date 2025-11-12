@@ -9,15 +9,48 @@ private:
 	double price;
 	bool available;
 public:
-	Product(string n, int c, double p, bool a) : name(n), count(c), price(p), available(a) {};
+	Product(string n, int c, double p, bool a) : name(n), available(a) {
+		if (c < 0) {
+			count = 0;
+		}
+		else {
+			count = c;
+		}
+		if (p < 0) {
+			price = 0;
+		}
+		else {
+			price = p;
+		}
+	};
 	explicit Product(string n) : name(n), count(0), price(0.0), available(false) {};
-	Product(Product& product) {
+	Product(const Product& product) {
 		this->name = product.name;
 		this->count= product.count;
 		this->price = product.price;
 		this->available = product.available;
 	};
+	string getName() const {
+		return name;
+	}
+	int getCount() const {
+		return count;
+	}
+	double getPrice() const {
+		return price;
+	}
+	bool getAvailable() const {
+		return available;
+	}
+	void getInfo() {
+		cout << "Name: " << name << endl;
+		cout << "Count: " << count << endl;
+		cout << "Price: " << price << endl;
+		cout << boolalpha << "Available: " << available << endl;
+	}
 };
 int main()
 {
+	Product p("Apple", 10, 15, true);
+	p.getInfo();
 }
