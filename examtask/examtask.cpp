@@ -91,6 +91,17 @@ private:
 public:
 	Store(vector<Product> p) : products(p) {};
 	Store(const Store& store) : products(store.products) {};
+	void addProduct(const Product& p) {
+		products.push_back(p);
+	}
+	void removeProduct(int index) {
+		if (index >= 0 && index < products.size()) {
+			products.erase(products.begin() + index);
+		}
+		else {
+			cout << "Invalid index!" << endl;
+		}
+	}
 };
 int main()
 {
