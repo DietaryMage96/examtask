@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 class Product {
@@ -82,6 +83,14 @@ public:
 	bool CounttoCountequal(const Product& p) const {
 		return getCount() == p.getCount();
 	}
+};
+
+class Store {
+private:
+	vector<Product> products;
+public:
+	Store(vector<Product> p) : products(p) {};
+	Store(const Store& store) : products(store.products) {};
 };
 int main()
 {
