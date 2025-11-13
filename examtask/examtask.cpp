@@ -4,16 +4,40 @@
 #include <vector>
 using namespace std;
 
+enum class Category {
+	Fruit,
+	Vegetable,
+	Dairy,
+	Meat,
+	Other
+};
+string cts(Category c) {
+	switch (c) {
+	case Category::Fruit: return "Fruit";
+	case Category::Vegetable: return "Vegetable";
+	case Category::Dairy: return "Dairy";
+	case Category::Meat: return "Meat";
+	case Category::Other: return "Other";
+	default: return "Unknown";
+	}
+}
+Category stc(const string& s) {
+	if (s == "Fruit") return Category::Fruit;
+	if (s == "Vegetable") return Category::Vegetable;
+	if (s == "Dairy") return Category::Dairy;
+	if (s == "Meat") return Category::Meat;
+	return Category::Other;
+}
 class Product {
 private:
 	string name;
 	int count;
 	double price;
 	bool available;
-	string category;
+	Category category;
 public:
 	Product(Product&&) = default;
-	Product(string n, int c, double p, bool a, string cc) : name(n), available(a), category(cc) {
+	Product(string n, int c, double p, bool a, Category cc) : name(n), available(a), category(cc) {
 		if (c < 0) {
 			count = 0;
 		}
@@ -47,12 +71,12 @@ public:
 	bool getAvailable() const {
 		return available;
 	}
-	string getCategory() const {
+	Category getCategory() const {
 		return category;
 	}
 	void getInfo() const {
 		cout << "Name: " << name << endl;
-		cout << "Category: " << category << endl;
+		cout << "Category: " << cts(category) << endl;
 		cout << "Count: " << count << endl;
 		cout << "Price: " << price << endl;
 		cout << boolalpha << "Available: " << available << endl;
@@ -225,7 +249,7 @@ public:
 			}
 
 			if (searchProduct(name, price, count) == -1) {
-				products.push_back(Product(name, count, price, available, category));
+				products.push_back(Product(name, count, price, available, stc(category)));
 			}
 		}
 		file.close();
@@ -234,10 +258,10 @@ public:
 };
 int main()
 {
-	Product p1("Apple", 10, 15, true, "Fruit");
-	Product p2("Banana", 20, 10, true, "Fruit");
-	Product p3("Pineapple", 5, 20, false, "Fruit");
-	Product p4("Potato", 25, 5, true, "Vegetable");
+	Product p1("Apple", 10, 15, true, stc("Fruit"));
+	Product p2("Banana", 20, 10, true, stc("Fruit"));
+	Product p3("Pineapple", 5, 20, false, stc("Fruit"));
+	Product p4("Potato", 25, 5, true, stc("Vegetable"));
 	Store s({ p2, p3, p1, p4 });
 
 	s.sortByName();
