@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 using namespace std;
@@ -170,6 +171,20 @@ public:
 			}
 		}
 	}
+
+	void saveToFile(string fname = "data.txt") {
+		ofstream file(fname);
+		if (!file.is_open()) {
+			cout << "Error while opening the file " << endl;
+			return;
+		}
+		for (int i = 0; i < products.size(); i++) {
+			file << products[i].getName() << ";" << products[i].getCount() << ";" << products[i].getPrice() << ";" << products[i].getAvailable() << ";" << products[i].getCategory() << ";" << endl;
+		}
+		file.close();
+		cout << "Saved! " << endl;
+	}
+
 };
 int main()
 {
@@ -179,10 +194,11 @@ int main()
 	Product p4("Potato", 25, 5, true, "Vegetable");
 	Store s({ p2, p3, p1, p4 });
 
-	/*s.sortByName();
-	s.printAll();*/
+	s.sortByName();
+	s.printAll();
 	/*s.sortByPrice();
 	s.printAll();*/
 	/*s.sortByCount();
 	s.printAll();*/
+	s.saveToFile();
 }

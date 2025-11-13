@@ -1,0 +1,4 @@
+Apple;10;15;1;Fruit;
+Banana;20;10;1;Fruit;
+Pineapple;5;20;0;Fruit;
+Potato;25;5;1;Vegetable;
