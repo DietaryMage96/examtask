@@ -94,30 +94,16 @@ public:
 		}
 	}
 	int searchProduct(string n = "", double p = -1, int c = -1) {
-		if (n != "") {
-			for (int i = 0; i < products.size(); i++) {
-				if (products[i].getName() == n) {
-					return i;
-				}
+		for (int i = 0; i < products.size(); i++) {
+			bool nameMatch = (n == "" || products[i].getName() == n);
+			bool priceMatch = (p < 0 || products[i].getPrice() == p);
+			bool countMatch = (c < 0 || products[i].getCount() == c);
+
+			if (nameMatch && priceMatch && countMatch) {
+				return i;
 			}
 		}
-		else if (p != -1) {
-			for (int i = 0; i < products.size(); i++) {
-				if (products[i].getPrice() == p) {
-					return i;
-				}
-			}
-		}
-		else if (c != -1) {
-			for (int i = 0; i < products.size(); i++) {
-				if (products[i].getCount() == c) {
-					return i;
-				}
-			}
-		}
-		else {
-			return -1;
-		}
+		return -1;
 	}
 	double averagePrice() const {
 		if (products.empty()) {
@@ -179,12 +165,65 @@ public:
 			return;
 		}
 		for (int i = 0; i < products.size(); i++) {
-			file << products[i].getName() << ";" << products[i].getCount() << ";" << products[i].getPrice() << ";" << products[i].getAvailable() << ";" << products[i].getCategory() << ";" << endl;
+			file << products[i].getName() << "|" << products[i].getCount() << "|" << products[i].getPrice() << "|" << products[i].getAvailable() << "|" << products[i].getCategory() << "|" << endl;
 		}
 		file.close();
 		cout << "Saved! " << endl;
 	}
+	void loadFromFile(string fname = "data.txt") {
+		ifstream file(fname);
+		if (!file.is_open()) {
+			cout << "Error while opening the file " << endl;
+			return;
+		}
+		string line;
+		while (getline(file, line)) {
+			string fields[5];
+			int index = 0;
 
+			for (char c : line) {
+				if (c == '|') {
+					index++;
+					if (index >= 5) break;
+				}
+				else {
+					fields[index] += c;
+				}
+			}
+
+			if (index < 4) continue;
+
+			string name = fields[0];
+			int count;
+			double price;
+			bool available;
+			string category = fields[4];
+
+			try {
+				count = stoi(fields[1]);
+				price = stod(fields[2]);
+			}
+			catch (...) {
+				continue;
+			}
+
+			if (fields[3] == "1" || fields[3] == "true") {
+				available = true;
+			}
+			else if (fields[3] == "0" || fields[3] == "false") {
+				available = false;
+			}
+			else {
+				continue;
+			}
+
+			if (searchProduct(name, price, count) == -1) {
+				products.push_back(Product(name, count, price, available, category));
+			}
+		}
+		file.close();
+		cout << "Loaded! " << endl;
+	}
 };
 int main()
 {
@@ -195,10 +234,17 @@ int main()
 	Store s({ p2, p3, p1, p4 });
 
 	s.sortByName();
-	s.printAll();
+	/*s.printAll();*/
 	/*s.sortByPrice();
 	s.printAll();*/
 	/*s.sortByCount();
 	s.printAll();*/
-	s.saveToFile();
+	//s.saveToFile();
+	s.removeProduct(0);
+	s.removeProduct(1);
+	//cout << endl << "Print after removing" << endl;
+	//s.printAll();
+	s.loadFromFile();
+	cout << "Print after loading" << endl << endl;
+	s.printAll();
 }
