@@ -9,8 +9,9 @@ private:
 	int count;
 	double price;
 	bool available;
+	string category;
 public:
-	Product(string n, int c, double p, bool a) : name(n), available(a) {
+	Product(string n, int c, double p, bool a, string cc) : name(n), available(a), category(cc) {
 		if (c < 0) {
 			count = 0;
 		}
@@ -24,12 +25,13 @@ public:
 			price = p;
 		}
 	};
-	explicit Product(string n) : name(n), count(0), price(0.0), available(false) {};
+	explicit Product(string n) : name(n), count(0), price(0.0), available(false), category("") {};
 	Product(const Product& product) {
 		this->name = product.name;
 		this->count= product.count;
 		this->price = product.price;
 		this->available = product.available;
+		this->category = product.category;
 	};
 	string getName() const {
 		return name;
@@ -43,8 +45,12 @@ public:
 	bool getAvailable() const {
 		return available;
 	}
+	string getCategory() const {
+		return category;
+	}
 	void getInfo() const {
 		cout << "Name: " << name << endl;
+		cout << "Category: " << category << endl;
 		cout << "Count: " << count << endl;
 		cout << "Price: " << price << endl;
 		cout << boolalpha << "Available: " << available << endl;
@@ -84,7 +90,6 @@ public:
 		return getCount() == p.getCount();
 	}
 };
-
 class Store {
 private:
 	vector<Product> products;
@@ -143,8 +148,8 @@ public:
 };
 int main()
 {
-	Product p1("Apple", 10, 15, true);
-	Product p2("Banana", 20, 10, true);
+	Product p1("Apple", 10, 15, true, "Fruit");
+	Product p2("Banana", 20, 10, true, "Fruit");
 	Store s({ p1, p2 });
 
 	cout << "Search Banana: " << s.searchProduct("Banana") << endl;
