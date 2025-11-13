@@ -128,6 +128,18 @@ public:
 			return -1;
 		}
 	}
+	double averagePrice() const {
+		if (products.empty()) {
+			return 0;
+		}
+		double sum=0;
+		double count=0;
+		for (int i = 0; i < products.size(); i++) {
+			sum += products[i].getPrice() * products[i].getCount();
+			count += products[i].getCount();
+		}
+		return sum / count;
+	}
 };
 int main()
 {
@@ -135,5 +147,7 @@ int main()
 	Product p2("Banana", 20, 10, true);
 	Store s({ p1, p2 });
 
-	cout << "Search 'Banana': " << s.searchProduct("Banana") << endl;
+	cout << "Search Banana: " << s.searchProduct("Banana") << endl;
+
+	cout << "Average price: " << s.averagePrice();
 }
