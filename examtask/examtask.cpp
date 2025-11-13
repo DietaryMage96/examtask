@@ -74,21 +74,6 @@ public:
 	bool operator==(const Product& p) const {
 		return getPrice() == p.getPrice() && getName() == p.getName() && getCount() == p.getCount() && getAvailable() == p.getAvailable();
 	}
-	bool NametoName(const Product& p) const {
-		return getName() == p.getName();
-	}
-	bool PricetoPrice(const Product& p) const {
-		return getPrice() == p.getPrice();
-	}
-	bool CounttoCountless(const Product& p) const {
-		return getCount() < p.getCount();
-	}
-	bool CounttoCountmore(const Product& p) const {
-		return getCount() > p.getCount();
-	}
-	bool CounttoCountequal(const Product& p) const {
-		return getCount() == p.getCount();
-	}
 };
 class Store {
 private:
@@ -107,7 +92,7 @@ public:
 			cout << "Invalid index!" << endl;
 		}
 	}
-	int searchProduct(string n="", double p=-1, int c=-1) {
+	int searchProduct(string n = "", double p = -1, int c = -1) {
 		if (n != "") {
 			for (int i = 0; i < products.size(); i++) {
 				if (products[i].getName() == n) {
@@ -115,7 +100,7 @@ public:
 				}
 			}
 		}
-		else if(p != -1) {
+		else if (p != -1) {
 			for (int i = 0; i < products.size(); i++) {
 				if (products[i].getPrice() == p) {
 					return i;
@@ -129,7 +114,7 @@ public:
 				}
 			}
 		}
-		else{
+		else {
 			return -1;
 		}
 	}
@@ -137,22 +122,67 @@ public:
 		if (products.empty()) {
 			return 0;
 		}
-		double sum=0;
-		double count=0;
+		double sum = 0;
+		double count = 0;
 		for (int i = 0; i < products.size(); i++) {
 			sum += products[i].getPrice() * products[i].getCount();
 			count += products[i].getCount();
 		}
 		return sum / count;
 	}
+	void printAll() {
+		for (int i = 0; i < products.size(); i++) {
+			cout << "Products #" << i << endl;
+			products[i].getInfo();
+			cout << endl;
+		}
+	}
+	void sortByName() {
+		for (int i = 0; i < products.size() - 1; i++) {
+			for (int j = i + 1; j < products.size(); j++) {
+				if (products[i].getName() > products[j].getName()) {
+					Product temp = products[i];
+					products[i] = products[j];
+					products[j] = temp;
+				}
+			}
+		}
+	}
+	void sortByPrice() {
+		for (int i = 0; i < products.size() - 1; i++) {
+			for (int j = i + 1; j < products.size(); j++) {
+				if (products[i] > products[j]) {
+					Product temp = products[i];
+					products[i] = products[j];
+					products[j] = temp;
+				}
+			}
+		}
+	}
+	void sortByCount() {
+		for (int i = 0; i < products.size() - 1; i++) {
+			for (int j = i + 1; j < products.size(); j++) {
+				if (products[i].getCount() < products[j].getCount()) {
+					Product temp = products[i];
+					products[i] = products[j];
+					products[j] = temp;
+				}
+			}
+		}
+	}
 };
 int main()
 {
 	Product p1("Apple", 10, 15, true, "Fruit");
 	Product p2("Banana", 20, 10, true, "Fruit");
-	Store s({ p1, p2 });
+	Product p3("Pineapple", 5, 20, false, "Fruit");
+	Product p4("Potato", 25, 5, true, "Vegetable");
+	Store s({ p2, p3, p1, p4 });
 
-	cout << "Search Banana: " << s.searchProduct("Banana") << endl;
-
-	cout << "Average price: " << s.averagePrice();
+	/*s.sortByName();
+	s.printAll();*/
+	/*s.sortByPrice();
+	s.printAll();*/
+	/*s.sortByCount();
+	s.printAll();*/
 }
