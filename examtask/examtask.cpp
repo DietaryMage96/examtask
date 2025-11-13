@@ -38,20 +38,23 @@ private:
 public:
 	Product(Product&&) = default;
 	Product(string n, int c, double p, bool a, Category cc) : name(n), available(a), category(cc) {
+		if (n.empty()) throw invalid_argument("Product name cannot be empty");
 		if (c < 0) {
+			cout << "Warning: negative count for product " << n << ", automatically set to 0." << endl;
 			count = 0;
 		}
 		else {
 			count = c;
 		}
 		if (p < 0) {
+			cout << "Warning: negative price for product " << n << ", automatically set to 0." << endl;
 			price = 0;
 		}
 		else {
 			price = p;
 		}
 	};
-	explicit Product(string n) : name(n), count(0), price(0.0), available(false), category("") {};
+	explicit Product(string n, Category c) : name(n), count(0), price(0.0), available(false), category(c) {};
 	Product(const Product& product) {
 		this->name = product.name;
 		this->count= product.count;
@@ -233,8 +236,11 @@ public:
 			try {
 				count = stoi(fields[1]);
 				price = stod(fields[2]);
+				if (count < 0) throw invalid_argument("Negative count in file");
+				if (price < 0) throw invalid_argument("Negative price in file");
 			}
-			catch (...) {
+			catch (const exception& e) {
+				cout << "Skipping invalid product: " << e.what() << endl;
 				continue;
 			}
 
