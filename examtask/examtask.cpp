@@ -102,11 +102,38 @@ public:
 			cout << "Invalid index!" << endl;
 		}
 	}
+	int searchProduct(string n="", double p=-1, int c=-1) {
+		if (n != "") {
+			for (int i = 0; i < products.size(); i++) {
+				if (products[i].getName() == n) {
+					return i;
+				}
+			}
+		}
+		else if(p != -1) {
+			for (int i = 0; i < products.size(); i++) {
+				if (products[i].getPrice() == p) {
+					return i;
+				}
+			}
+		}
+		else if (c != -1) {
+			for (int i = 0; i < products.size(); i++) {
+				if (products[i].getCount() == c) {
+					return i;
+				}
+			}
+		}
+		else{
+			return -1;
+		}
+	}
 };
 int main()
 {
-	Product p("Apple", 10, 15, true);
-	p.getInfo();
-	p += 10;
-	cout << p.getCount();
+	Product p1("Apple", 10, 15, true);
+	Product p2("Banana", 20, 10, true);
+	Store s({ p1, p2 });
+
+	cout << "Search 'Banana': " << s.searchProduct("Banana") << endl;
 }
