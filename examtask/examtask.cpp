@@ -12,6 +12,7 @@ private:
 	bool available;
 	string category;
 public:
+	Product(Product&&) = default;
 	Product(string n, int c, double p, bool a, string cc) : name(n), available(a), category(cc) {
 		if (c < 0) {
 			count = 0;
@@ -80,18 +81,24 @@ class Store {
 private:
 	vector<Product> products;
 public:
+	Store(Store&&) = default;
 	Store(vector<Product> p) : products(p) {};
 	Store(const Store& store) : products(store.products) {};
 	void addProduct(const Product& p) {
 		products.push_back(p);
 	}
-	void removeProduct(int index) {
-		if (index >= 0 && index < products.size()) {
-			products.erase(products.begin() + index);
+	bool removeProduct(int index) {
+		if (!products.empty()) {
+			if (index >= 0 && index < products.size()) {
+				products.erase(products.begin() + index);
+				return true;
+			}
+			else {
+				cout << "Invalid index!" << endl;
+				return false;
+			}
 		}
-		else {
-			cout << "Invalid index!" << endl;
-		}
+		return false;
 	}
 	int searchProduct(string n = "", double p = -1, int c = -1) {
 		for (int i = 0; i < products.size(); i++) {
