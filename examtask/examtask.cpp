@@ -35,6 +35,7 @@ private:
 	double price;
 	bool available;
 	Category category;
+	vector<double> PriceHistory;
 public:
 	Product(Product&&) = default;
 	Product(string n, int c, double p, bool a, Category cc) : name(n), available(a), category(cc) {
@@ -88,7 +89,6 @@ public:
 		count += c;
 		return *this;
 	}
-
 	Product& operator-=(int c) {
 		count -= c;
 		if (count < 0) count = 0;
@@ -103,6 +103,21 @@ public:
 	bool operator==(const Product& p) const {
 		return getPrice() == p.getPrice() && getName() == p.getName() && getCount() == p.getCount() && getAvailable() == p.getAvailable();
 	}
+	void setPrice(double p) {
+		price = p;
+		PriceHistory.push_back(p);
+	}
+	void printPriceHistory() {
+		cout << "Price history: " << endl;
+		for (int i = 0; i < PriceHistory.size(); i++) {
+			cout << "#" << i << " " << PriceHistory[i] << endl;
+		}
+	}
+	vector<double> getPriceHistory() {
+		return PriceHistory;
+	}
+	Product& operator=(const Product&) = default;
+	Product& operator=(Product&&) = default;
 };
 class Store {
 private:
@@ -199,7 +214,7 @@ public:
 			return;
 		}
 		for (int i = 0; i < products.size(); i++) {
-			file << products[i].getName() << "|" << products[i].getCount() << "|" << products[i].getPrice() << "|" << products[i].getAvailable() << "|" << products[i].getCategory() << "|" << endl;
+			file << products[i].getName() << "|" << products[i].getCount() << "|" << products[i].getPrice() << "|" << products[i].getAvailable() << "|" << cts(products[i].getCategory()) << "|" << endl;
 		}
 		file.close();
 		cout << "Saved! " << endl;
@@ -270,7 +285,7 @@ int main()
 	Product p4("Potato", 25, 5, true, stc("Vegetable"));
 	Store s({ p2, p3, p1, p4 });
 
-	s.sortByName();
+	//s.sortByName();
 	/*s.printAll();*/
 	/*s.sortByPrice();
 	s.printAll();*/
@@ -284,4 +299,10 @@ int main()
 	s.loadFromFile();
 	cout << "Print after loading" << endl << endl;
 	s.printAll();
+
+	/*cout << endl << endl << endl;
+	p1.setPrice(10);
+	p1.setPrice(20);
+	p1.setPrice(15);
+	p1.printPriceHistory();*/
 }
