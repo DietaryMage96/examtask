@@ -4,6 +4,14 @@
 #include <vector>
 using namespace std;
 
+class Supplier {
+private:
+	string name;
+	string contact;
+	int rating;
+public:
+	Supplier(string n, string c, int r) : name(n), contact(c), rating(r) {};
+};
 enum class Category {
 	Fruit,
 	Vegetable,
@@ -36,9 +44,10 @@ private:
 	bool available;
 	Category category;
 	vector<double> PriceHistory;
+	Supplier* supplier;
 public:
 	Product(Product&&) = default;
-	Product(string n, int c, double p, bool a, Category cc) : name(n), available(a), category(cc) {
+	Product(string n, int c, double p, bool a, Category cc, Supplier* s) : name(n), available(a), category(cc), supplier(s) {
 		if (n.empty()) throw invalid_argument("Product name cannot be empty");
 		if (c < 0) {
 			cout << "Warning: negative count for product " << n << ", automatically set to 0." << endl;
@@ -55,13 +64,15 @@ public:
 			price = p;
 		}
 	};
-	explicit Product(string n, Category c) : name(n), count(0), price(0.0), available(false), category(c) {};
+	explicit Product(string n, Category c) : name(n), count(0), price(0.0), available(false), category(c), supplier(nullptr) {};
 	Product(const Product& product) {
 		this->name = product.name;
 		this->count= product.count;
 		this->price = product.price;
 		this->available = product.available;
 		this->category = product.category;
+		this->PriceHistory = product.PriceHistory;
+		this->supplier = product.supplier;
 	};
 	string getName() const {
 		return name;
@@ -115,6 +126,9 @@ public:
 	}
 	vector<double> getPriceHistory() {
 		return PriceHistory;
+	}
+	Supplier* getSupplier() {
+		return supplier;
 	}
 	Product& operator=(const Product&) = default;
 	Product& operator=(Product&&) = default;
