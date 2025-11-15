@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <mutex>
 using namespace std;
 class Supplier {
 private:
@@ -104,7 +105,10 @@ public:
 		cout << "Count: " << count << endl;
 		cout << "Price: " << price << endl;
 		cout << boolalpha << "Available: " << available << endl;
-		cout << "Supplier name: " << supplier->getName() << endl;
+		if (supplier != nullptr)
+			cout << "Supplier name: " << supplier->getName() << endl;
+		else
+			cout << "Supplier: None" << endl;
 	}
 	Product& operator+=(int c) {
 		count += c;
@@ -200,6 +204,7 @@ public:
 	bool removeProduct(int index) {
 		if (!products.empty()) {
 			if (index >= 0 && index < products.size()) {
+				delete products[index];
 				products.erase(products.begin() + index);
 				return true;
 			}
@@ -328,7 +333,7 @@ public:
 			int count = stoi(f[2]);
 			double price = stod(f[3]);
 			bool available = false;
-			if (f[4] == "1") {
+			if (f[4] == "1" || f[4] == "true") {
 				available = true;
 			}
 			Category cat = stc(f[5]);
@@ -371,7 +376,10 @@ public:
 		}
 	}
 };
+
+mutex m;
 void autoSave(Store* store) {
+	lock_guard<mutex> lock(m);
 	store->saveProducts();
 }
 void Menu() {
@@ -567,7 +575,7 @@ void Menu() {
 			cout << "Invalid choice!" << endl;
 			break;
 		}
-		if (counter >= 5) {
+		if (counter >= 10) {
 			thread saver(autoSave, &store);
 			saver.detach();
 			counter = 0;
