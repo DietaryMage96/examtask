@@ -283,7 +283,7 @@ public:
 	void saveProducts(string fname = "products.txt") {
 		ofstream file(fname);
 		if (!file.is_open()) {
-			cout << "Error while opening the file\n";
+			cout << "Error while opening the file" << endl;
 			return;
 		}
 		products.clear();
@@ -293,12 +293,12 @@ public:
 			file << type << "|"	<< p->getName() << "|" << p->getCount() << "|" << p->getPrice() << "|" << p->getAvailable() << "|" << cts(p->getCategory()) << "|"	<< p->getSupplierName() << "|" << p->getSupplier()->getContact() << "|"	<< p->getSupplier()->getRating() << "|" << p->getBrand() << "|" << p->getInsurance() << "|" << endl;
 		}
 		file.close();
-		cout << "Products saved!\n";
+		cout << "Products saved!" << endl;
 	}
 	void loadProducts(string fname = "products.txt") {
 		ifstream file(fname);
 		if (!file.is_open()) {
-			cout << "Error while opening the file\n";
+			cout << "Error while opening the file" << endl;
 			return;
 		}
 		string line;
@@ -343,12 +343,127 @@ public:
 			}
 		}
 		file.close();
-		cout << "Products loaded!\n";
+		cout << "Products loaded!" << endl;
+	}
+	void printP(int i) {
+		products[i]->getInfo();
 	}
 };
+
+void Menu() {
+	Store store({});
+	int choice = -1;
+	while (choice != 0) {
+		cout << endl << "=== STORE MENU ===" << endl;
+		cout << "1. Show all products" << endl;
+		cout << "2. Add product" << endl;
+		cout << "3. Remove product" << endl;
+		cout << "4. Search product" << endl;
+		cout << "5. Sort products by name" << endl;
+		cout << "6. Sort products by price" << endl;
+		cout << "7. Sort products by count" << endl;
+		cout << "8. Save products to file" << endl;
+		cout << "9. Load products from file" << endl;
+		cout << "0. Exit" << endl;
+		cout << "Enter choice: ";
+		cin >> choice;
+
+		switch (choice) {
+		case 1:
+			store.printAll();
+			break;
+		case 2:{
+			string name, catStr, supplierName, supplierContact;
+			int count, supplierRating;
+			double price;
+			bool avail;
+
+			cout << "Product name: "; cin >> name;
+			cout << "Count: "; cin >> count;
+			cout << "Price: "; cin >> price;
+			cout << "Available (1/0): "; cin >> avail;
+			cout << "Category (Fruit, Vegetable, Dairy, Meat, Other): "; cin >> catStr;
+			cout << "Supplier name: "; cin >> supplierName;
+			cout << "Supplier contact: "; cin >> supplierContact;
+			cout << "Supplier rating: "; cin >> supplierRating;
+
+			Supplier* s = store.findSupplier(supplierName);
+			if (!s) s = new Supplier(supplierName, supplierContact, supplierRating);
+
+			char type;
+			cout << "Normal or Luxury (N/L): "; cin >> type;
+			if (type == 'L' || type == 'l') {
+				string brand;
+				bool ins;
+				cout << "Brand: "; cin >> brand;
+				cout << "Has insurance (1/0): "; cin >> ins;
+				store.addProduct(new LuxuryProduct(name, count, price, avail, stc(catStr), s, brand, ins));
+			}
+			else {
+				store.addProduct(new Product(name, count, price, avail, stc(catStr), s));
+			}
+			cout << "Product added!" << endl;
+			break;
+		}
+		case 3: {
+			int idx;
+			cout << "Enter product index to remove: "; cin >> idx;
+			if (store.removeProduct(idx)) {
+				cout << "Removed!" << endl;
+			}
+			break;
+		}
+		case 4: {
+			string name;
+			double price;
+			int count;
+			cout << "Enter name to search (Enter to skip): ";
+			getline(cin, name);
+			cout << "Enter price to search (-1 to skip): ";
+			cin >> price;
+			cout << "Enter count to search (-1 to skip): ";
+			cin >> count;
+			int idx = store.searchProduct(name, price, count);
+			if (idx != -1) {
+				cout << "Found product at index " << idx << ":" << endl;
+				store.printP(idx);
+			}
+			else {
+				cout << "Not found!" << endl;
+			}
+			break;
+		}
+		case 5:
+			store.sortByName();
+			cout << "Sorted by name." << endl;
+			break;
+		case 6:
+			store.sortByPrice();
+			cout << "Sorted by price." << endl;
+			break;
+		case 7:
+			store.sortByCount();
+			cout << "Sorted by count." << endl;
+			break;
+		case 8:
+			store.saveProducts();
+			break;
+		case 9:
+			store.loadProducts();
+			break;
+		case 0:
+			cout << "Exiting..." << endl;
+			break;
+		default:
+			cout << "Invalid choice!" << endl;
+			break;
+		}
+	}
+}
 int main()
 {
-	Supplier s1("FreshLine Supply", "+380671234567", 5);
+	Menu();
+	/*Supplier s1("FreshLine Supply", "+380671234567", 5);
 	Supplier s2("PremiumFoods UA", "premiumfoods.ua@gmail.com", 5);
 	Supplier s3("GreenHarvest Co.", "+380509876543", 3);
 	Supplier s4("AgroTrade Global", "support@agrotrade.com", 4);
@@ -359,7 +474,7 @@ int main()
 	LuxuryProduct p5("Dark Belgium Chocolate", 12, 50, true, stc("Other"), &s2, "Godiva", true);
 	Store s({ &p2, &p3, &p4});
 	s.addProduct(&p5);
-	s.addProduct(&p1);
+	s.addProduct(&p1);*/
 	//s.sortByName();
 	/*s.printAll();*/
 	/*s.sortByPrice();
@@ -372,12 +487,13 @@ int main()
 	//cout << endl << "Print after removing" << endl;
 	//s.printAll();
 	//s.loadFromFile();
-	cout << "Print after loading" << endl << endl;
-	s.printAll();
+	/*cout << "Print after loading" << endl << endl;
+	s.printAll();*/
 
 	/*cout << endl << endl << endl;
 	p1.setPrice(10);
 	p1.setPrice(20);
 	p1.setPrice(15);
 	p1.printPriceHistory();*/
+	
 }
