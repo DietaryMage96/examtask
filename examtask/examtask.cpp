@@ -4,6 +4,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+
 using namespace std;
 class Supplier {
 private:
@@ -197,7 +198,14 @@ private:
 public:
 	Store(Store&&) = default;
 	Store(vector<Product*> p) : products(p) {};
-	Store(const Store& store) : products(store.products) {};
+	Store(const Store& store) {
+		for (int i = 0; i < store.products.size(); i++) {
+			this->products[i] = store.products[i];
+		}
+		for (int i = 0; i < store.suppliers.size(); i++) {
+			this->suppliers[i] = store.suppliers[i];
+		}
+	};
 	void addProduct(Product* p) {
 		products.push_back(p);
 	}
@@ -307,7 +315,6 @@ public:
 			file << type << "|"	<< p->getName() << "|" << p->getCount() << "|" << p->getPrice() << "|" << p->getAvailable() << "|" << cts(p->getCategory()) << "|"	<< p->getSupplierName() << "|" << p->getSupplier()->getContact() << "|"	<< p->getSupplier()->getRating() << "|" << p->getBrand() << "|" << p->getInsurance() << "|" << endl;
 		}
 		file.close();
-		cout << "Products saved!" << endl;
 	}
 	void loadProducts(string fname = "products.txt") {
 		ifstream file(fname);
@@ -358,7 +365,6 @@ public:
 			}
 		}
 		file.close();
-		cout << "Products loaded!" << endl;
 	}
 	void printP(int i) {
 		products[i]->getInfo();
@@ -387,6 +393,11 @@ void Menu() {
 	Store store({});
 	int choice = -1;
 	while (choice != 0) {
+		if (counter >= 10) {
+			thread saver(autoSave, &store);
+			saver.detach();
+			counter = 0;
+		}
 		cout << endl << "=== STORE MENU ===" << endl;
 		cout << "1. Show all products" << endl;
 		cout << "2. Add product" << endl;
@@ -398,6 +409,7 @@ void Menu() {
 		cout << "8. Save products to file" << endl;
 		cout << "9. Load products from file" << endl;
 		cout << "0. Exit" << endl;
+		cout << "Steps before automatic saving: " << 10-counter << endl;
 		cout << "Enter choice: ";
 		cin >> choice;
 
@@ -559,12 +571,18 @@ void Menu() {
 			counter++;
 			break;
 		case 8:
-			try { store.saveProducts(); }
+			try { 
+				store.saveProducts();
+				cout << "Products saved!" << endl;
+			}
 			catch (const exception& e) { cout << "Error: " << e.what() << endl; }
 			counter++;
 			break;
 		case 9:
-			try { store.loadProducts(); }
+			try { 
+				store.loadProducts();
+				cout << "Products loaded!" << endl;
+			}
 			catch (const exception& e) { cout << "Error: " << e.what() << endl; }
 			counter++;
 			break;
@@ -574,11 +592,6 @@ void Menu() {
 		default:
 			cout << "Invalid choice!" << endl;
 			break;
-		}
-		if (counter >= 10) {
-			thread saver(autoSave, &store);
-			saver.detach();
-			counter = 0;
 		}
 	}
 }

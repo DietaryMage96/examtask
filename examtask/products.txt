@@ -1,1 +1,3 @@
-L|1|1|1|1|Other|1|1|1|1|1|
+N|Aple|0|5|0|Fruit|Garden|garden@nehelp|3||0|
+N|Bread|10|15|1|Other|Bakery|bakery@help|4||0|
+L|Laptop|3|150|1|Other|Samsung|samnesam@help|5|Samsung|1|
