@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <thread>
 using namespace std;
 class Supplier {
 private:
@@ -166,7 +167,7 @@ public:
 		cout << "Count: " << getCount() << endl;
 		cout << "Price: " << getPrice() << endl;
 		cout << boolalpha << "Available: " << getAvailable() << endl;
-		cout << "Supplier name: " << getSupplierName();
+		cout << "Supplier name: " << getSupplierName() << endl;
 		cout << "Brand: " << brand << endl;
 		if (insurance) {
 			cout << "Has insurance!" << endl;
@@ -241,36 +242,45 @@ public:
 		}
 	}
 	void sortByName() {
-		for (int i = 0; i < products.size() - 1; i++) {
-			for (int j = i + 1; j < products.size(); j++) {
-				if (products[i]->getName() > products[j]->getName()) {
-					Product* temp = products[i];
-					products[i] = products[j];
-					products[j] = temp;
+		if (!products.empty()) {
+			for (int i = 0; i < products.size() - 1; i++) {
+				for (int j = i + 1; j < products.size(); j++) {
+					if (products[i]->getName() > products[j]->getName()) {
+						Product* temp = products[i];
+						products[i] = products[j];
+						products[j] = temp;
+					}
 				}
 			}
+			cout << "Sorted by name." << endl;
 		}
 	}
 	void sortByPrice() {
-		for (int i = 0; i < products.size() - 1; i++) {
-			for (int j = i + 1; j < products.size(); j++) {
-				if (products[i] > products[j]) {
-					Product* temp = products[i];
-					products[i] = products[j];
-					products[j] = temp;
+		if (!products.empty()) {
+			for (int i = 0; i < products.size() - 1; i++) {
+				for (int j = i + 1; j < products.size(); j++) {
+					if (products[i] > products[j]) {
+						Product* temp = products[i];
+						products[i] = products[j];
+						products[j] = temp;
+					}
 				}
 			}
+			cout << "Sorted by price." << endl;
 		}
 	}
 	void sortByCount() {
-		for (int i = 0; i < products.size() - 1; i++) {
-			for (int j = i + 1; j < products.size(); j++) {
-				if (products[i]->getCount() < products[j]->getCount()) {
-					Product* temp = products[i];
-					products[i] = products[j];
-					products[j] = temp;
+		if (!products.empty()) {
+			for (int i = 0; i < products.size() - 1; i++) {
+				for (int j = i + 1; j < products.size(); j++) {
+					if (products[i]->getCount() < products[j]->getCount()) {
+						Product* temp = products[i];
+						products[i] = products[j];
+						products[j] = temp;
+					}
 				}
 			}
+			cout << "Sorted by count." << endl;
 		}
 	}
 	Supplier* findSupplier(const string& name) {
@@ -285,8 +295,7 @@ public:
 		if (!file.is_open()) {
 			cout << "Error while opening the file" << endl;
 			return;
-		}
-		products.clear();
+		}		
 		for (int i = 0; i < products.size(); i++) {
 			Product* p = products[i];
 			char type = p->get();
@@ -301,9 +310,10 @@ public:
 			cout << "Error while opening the file" << endl;
 			return;
 		}
+		products.clear();
 		string line;
 		while (getline(file, line)) {
-			string f[11];
+			string f[12];
 			int idx = 0;
 			for (int i = 0; i < line.size(); i++) {
 				if (line[i] == '|') {
@@ -348,9 +358,24 @@ public:
 	void printP(int i) {
 		products[i]->getInfo();
 	}
+	void pushSup(Supplier* s) {
+		if(findSupplier(s->getName())==nullptr)
+			suppliers.push_back(s);
+	}
+	~Store() {
+		for (int i = 0; i < products.size(); i++) {
+			delete products[i];
+		}
+		for (int i = 0; i < suppliers.size(); i++) {
+			delete suppliers[i];
+		}
+	}
 };
-
+void autoSave(Store* store) {
+	store->saveProducts();
+}
 void Menu() {
+	int counter = 0;
 	Store store({});
 	int choice = -1;
 	while (choice != 0) {
@@ -371,85 +396,169 @@ void Menu() {
 		switch (choice) {
 		case 1:
 			store.printAll();
+			counter++;
 			break;
-		case 2:{
+		case 2: {
 			string name, catStr, supplierName, supplierContact;
-			int count, supplierRating;
-			double price;
-			bool avail;
+			string countStr, priceStr, availStr, supplierRatingStr;
+			try {
+				cout << "Product name: ";
+				cin.ignore();
+				getline(cin, name);
 
-			cout << "Product name: "; cin >> name;
-			cout << "Count: "; cin >> count;
-			cout << "Price: "; cin >> price;
-			cout << "Available (1/0): "; cin >> avail;
-			cout << "Category (Fruit, Vegetable, Dairy, Meat, Other): "; cin >> catStr;
-			cout << "Supplier name: "; cin >> supplierName;
-			cout << "Supplier contact: "; cin >> supplierContact;
-			cout << "Supplier rating: "; cin >> supplierRating;
+				cout << "Count: ";
+				cin >> countStr;
+				int count = stoi(countStr);
+				if (count < 0)
+					throw invalid_argument("Count cannot be negative");
 
-			Supplier* s = store.findSupplier(supplierName);
-			if (!s) s = new Supplier(supplierName, supplierContact, supplierRating);
+				cout << "Price: ";
+				cin >> priceStr;
+				double price = stod(priceStr);
+				if (price < 0) 
+					throw invalid_argument("Price cannot be negative");
 
-			char type;
-			cout << "Normal or Luxury (N/L): "; cin >> type;
-			if (type == 'L' || type == 'l') {
-				string brand;
-				bool ins;
-				cout << "Brand: "; cin >> brand;
-				cout << "Has insurance (1/0): "; cin >> ins;
-				store.addProduct(new LuxuryProduct(name, count, price, avail, stc(catStr), s, brand, ins));
+				cout << "Available (1/0): ";
+				cin >> availStr;
+				bool avail;
+				if (availStr == "1") 
+					avail = true;
+				else if (availStr == "0")
+					avail = false;
+				else 
+					throw invalid_argument("Available must be 1 or 0");
+
+				cout << "Category (Fruit, Vegetable, Dairy, Meat, Other): ";
+				cin >> catStr;
+				Category cat = stc(catStr);
+
+				cout << "Supplier name: ";
+				cin >> supplierName;
+				cout << "Supplier contact: ";
+				cin >> supplierContact;
+
+				cout << "Supplier rating: ";
+				cin >> supplierRatingStr;
+				int supplierRating = stoi(supplierRatingStr);
+				if (supplierRating < 0) 
+					throw invalid_argument("Rating cannot be negative");
+
+				Supplier* s = store.findSupplier(supplierName);
+				if (!s) {
+					s = new Supplier(supplierName, supplierContact, supplierRating);
+					store.pushSup(s);
+				}
+				char type;
+				cout << "Normal or Luxury (N/L): ";
+				cin >> type;
+
+				if (type == 'L' || type == 'l') {
+					string brand, insStr;
+					cout << "Brand: ";
+					cin >> brand;
+
+					cout << "Has insurance (1/0): ";
+					cin >> insStr;
+					bool ins;
+					if (insStr == "1")
+						ins = true;
+					else if (insStr == "0")
+						ins = false;
+					else
+						throw invalid_argument("Insurance must be 1 or 0");
+
+					store.addProduct(new LuxuryProduct(name, count, price, avail, cat, s, brand, ins));
+				}
+				else {
+					store.addProduct(new Product(name, count, price, avail, cat, s));
+				}
+
+				cout << "Product added!" << endl;
 			}
-			else {
-				store.addProduct(new Product(name, count, price, avail, stc(catStr), s));
+			catch (const exception& e) {
+				cout << "Error adding product: " << e.what() << endl;
+				break;
 			}
-			cout << "Product added!" << endl;
+			counter++;
 			break;
 		}
 		case 3: {
-			int idx;
-			cout << "Enter product index to remove: "; cin >> idx;
-			if (store.removeProduct(idx)) {
-				cout << "Removed!" << endl;
+			try {
+				int idx;
+				cout << "Enter product index to remove: "; cin >> idx;
+				if (store.removeProduct(idx)) {
+					cout << "Removed!" << endl;
+				}
 			}
+			catch (const exception& e) {
+				cout << "Error: " << e.what() << endl;
+			}
+			counter++;
 			break;
 		}
 		case 4: {
-			string name;
-			double price;
-			int count;
-			cout << "Enter name to search (Enter to skip): ";
-			getline(cin, name);
-			cout << "Enter price to search (-1 to skip): ";
-			cin >> price;
-			cout << "Enter count to search (-1 to skip): ";
-			cin >> count;
-			int idx = store.searchProduct(name, price, count);
-			if (idx != -1) {
-				cout << "Found product at index " << idx << ":" << endl;
-				store.printP(idx);
+			try {
+				string name;
+				double price;
+				int count;
+				cout << "Enter name to search (Enter to skip): ";
+				cin.ignore();
+				getline(cin, name);
+				cout << "Enter price to search (-1 to skip): ";
+				cin >> price;
+				cout << "Enter count to search (-1 to skip): ";
+				cin >> count;
+				int idx = store.searchProduct(name, price, count);
+				if (idx != -1) {
+					cout << "Found product at index " << idx << ":" << endl;
+					store.printP(idx);
+				}
+				else {
+					cout << "Not found!" << endl;
+				}
 			}
-			else {
-				cout << "Not found!" << endl;
+			catch (const exception& e) {
+				cout << "Error: " << e.what() << endl;
 			}
+			counter++;
 			break;
 		}
 		case 5:
-			store.sortByName();
-			cout << "Sorted by name." << endl;
+			try {
+				store.sortByName();
+			}
+			catch (const exception& e) {
+				cout << "Error: " << e.what() << endl;
+			}
+			counter++;
 			break;
 		case 6:
-			store.sortByPrice();
-			cout << "Sorted by price." << endl;
+			try {
+				store.sortByPrice();
+			}
+			catch (const exception& e) {
+				cout << "Error: " << e.what() << endl;
+			}
+			counter++;
 			break;
 		case 7:
-			store.sortByCount();
-			cout << "Sorted by count." << endl;
+			try {
+				store.sortByCount();
+			}
+			catch (const exception& e) {
+				cout << "Error: " << e.what() << endl;
+			}
+			counter++;
 			break;
 		case 8:
-			store.saveProducts();
+			try { store.saveProducts(); }
+			catch (const exception& e) { cout << "Error: " << e.what() << endl; }
+			counter++;
 			break;
 		case 9:
-			store.loadProducts();
+			try { store.loadProducts(); }
+			catch (const exception& e) { cout << "Error: " << e.what() << endl; }
+			counter++;
 			break;
 		case 0:
 			cout << "Exiting..." << endl;
@@ -458,42 +567,14 @@ void Menu() {
 			cout << "Invalid choice!" << endl;
 			break;
 		}
+		if (counter >= 5) {
+			thread saver(autoSave, &store);
+			saver.detach();
+			counter = 0;
+		}
 	}
 }
 int main()
 {
 	Menu();
-	/*Supplier s1("FreshLine Supply", "+380671234567", 5);
-	Supplier s2("PremiumFoods UA", "premiumfoods.ua@gmail.com", 5);
-	Supplier s3("GreenHarvest Co.", "+380509876543", 3);
-	Supplier s4("AgroTrade Global", "support@agrotrade.com", 4);
-	Product p1("Apple", 10, 15, true, stc("Fruit"), &s1);
-	Product p2("Banana", 20, 10, true, stc("Fruit"), &s2);
-	Product p3("Pineapple", 5, 20, false, stc("Fruit"), &s3);
-	Product p4("Potato", 25, 5, true, stc("Vegetable"), &s4);
-	LuxuryProduct p5("Dark Belgium Chocolate", 12, 50, true, stc("Other"), &s2, "Godiva", true);
-	Store s({ &p2, &p3, &p4});
-	s.addProduct(&p5);
-	s.addProduct(&p1);*/
-	//s.sortByName();
-	/*s.printAll();*/
-	/*s.sortByPrice();
-	s.printAll();*/
-	/*s.sortByCount();
-	s.printAll();*/
-	//s.saveToFile();
-	/*s.removeProduct(0);
-	s.removeProduct(1);*/
-	//cout << endl << "Print after removing" << endl;
-	//s.printAll();
-	//s.loadFromFile();
-	/*cout << "Print after loading" << endl << endl;
-	s.printAll();*/
-
-	/*cout << endl << endl << endl;
-	p1.setPrice(10);
-	p1.setPrice(20);
-	p1.setPrice(15);
-	p1.printPriceHistory();*/
-	
 }
